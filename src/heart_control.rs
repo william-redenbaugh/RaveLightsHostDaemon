@@ -20,17 +20,17 @@ impl HeartControl{
     }
 
     // Allows to turn on/off the lamp
-    pub fn toggleLamp(&self){
+    pub fn toggle_lamp(&self){
         let cmd: [u8; 4] = [50, 50, 30, 92];
         self.socket.send_to(&cmd, "192.168.1.42:4250").expect("couldn't send data");
     }
 
-    pub fn lampOn(&self){
+    pub fn lamp_on(&self){
         let cmd: [u8; 4] = [50, 50, 30, 91];
         self.socket.send_to(&cmd, "192.168.1.42:4250").expect("couldn't send data");
     }
 
-    pub fn lampOff(&self){
+    pub fn lamp_off(&self){
         let cmd: [u8; 4] = [50, 50, 30, 90];
         self.socket.send_to(&cmd, "192.168.1.42:4250").expect("couldn't send data");
     }

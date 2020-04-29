@@ -2,9 +2,18 @@ use std::net::UdpSocket;
 use std::{thread, time};
 mod clock_control;
 mod heart_control;
+mod matrix_control; 
 
 fn main() {
     test_heart();
+}
+
+fn test_strip(){
+    let mut strip_control = matrix_control::MatrixControl{
+        socket: UdpSocket::bind("192.168.1.2:4220").expect("couldn't bind to address"),
+        data_arr: Vec::with_capacity(1600), 
+        num_pixels: 500
+    };
 }
 
 fn test_clock(){
@@ -37,5 +46,5 @@ fn test_heart(){
     thread::sleep(one_seccond);
     
     heart_control.unlock();
-    heart_control.lampOff();
+    heart_control.lamp_off();
 }
