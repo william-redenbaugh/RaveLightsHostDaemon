@@ -24,7 +24,7 @@ impl MatrixControl{
         
         // Provides messagedata fields. 
         let val = messagedata::MessageData{
-            message_size: (self.x_len * self.y_len * 3).into(), 
+            message_size: (self.x_len as u32 * self.y_len as u32 * 3) as u32, 
             message_type: messagedata::mod_MessageData::MessageType::MATRIX_DATA, 
             return_message: false
         };
@@ -54,7 +54,7 @@ impl MatrixControl{
             return;
         }
 
-        let mut spot: usize = ((_y * self.x_len + _x) * 3 + 16).into(); 
+        let mut spot: usize = ((_y as usize * self.x_len as usize + _x as usize) * 3 + 16); 
        
         // Sets our out array spots
         self.out_arr[spot] = _r;
@@ -66,7 +66,7 @@ impl MatrixControl{
 
     // Allows us to set all values to black
     pub fn set_all_black(&mut self){
-        for x in 0..(self.x_len * self.y_len * 3).into(){
+        for x in 0..(self.x_len as usize * self.y_len as usize * 3){
             self.out_arr[x] = 0; 
         }
     }
