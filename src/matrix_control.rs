@@ -1,6 +1,15 @@
+// The protobuffer crage that we are using
+extern crate quick_protobuf; 
+
+// Protobuffer writing module
+use quick_protobuf::Writer;
+// Standard UDP socket library
 use std::net::UdpSocket;
 
-// Matrix Controller Object for the 64 by 32 panel. 
+// Message data for matrix stuff!
+mod messagedata; 
+
+// Matrix Controller Object for a variable sized panel 
 pub struct MatrixControl{
     pub socket:UdpSocket,  
     pub address_port: String,
@@ -12,6 +21,29 @@ pub struct MatrixControl{
 impl MatrixControl{
     // Since we are going to be modifying values to a class, this is how we do it!
     pub fn begin(&mut self){
+        
+        // Provides messagedata fields. 
+        let val = messagedata::MessageData{
+            message_size: (self.x_len * self.y_len * 3).into(), 
+            message_type: messagedata::mod_MessageData::MessageType::MATRIX_DATA, 
+            return_message: false
+        };
+
+        {
+            let mut out = Vec::new();
+            let mut writer = Writer::new(&mut out);
+            writer
+                .write_message(&val)
+                .expect("Message couldn't write properly");
+            
+            let msg_fill = out.into_boxed_slice();
+            // Fills in the message data that will
+            // Indiciate what type of message this is!
+            for x in 0.. (msg_fill.len()).into(){
+                self.out_arr[x] = msg_fill[x];
+            }
+        }
+        
         // Sets all values to zero, and pushes off the udp send command
         self.set_all_black();
         self.update();

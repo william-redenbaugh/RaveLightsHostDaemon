@@ -16,7 +16,7 @@ fn test_matrix(){
     
     // Generates the array that we will save out matrix data in. 
     // On the heap, then ownership will be passed to MatrixController. 
-    let matrix_arr: Vec<u8> = vec![0; 6144];
+    let matrix_arr: Vec<u8> = vec![0; 6160];
     let matrix_arr_cnv = matrix_arr.into_boxed_slice();
     
     // Creates matrix object with defined size, passing in the array 
