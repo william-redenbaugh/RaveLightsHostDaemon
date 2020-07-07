@@ -6,14 +6,20 @@ mod matrix_control;
 
 fn main() {
     test_heart();
+    test_clock();
+    test_strip();
+
 }
 
 fn test_strip(){
-    let mut strip_control = matrix_control::MatrixControl{
-        socket: UdpSocket::bind("192.168.1.2:4220").expect("couldn't bind to address"),
-        data_arr: Vec::with_capacity(1600), 
-        num_pixels: 500
+    let mut matrix_ctr = matrix_control::MatrixControl{
+       socket: UdpSocket::bind("192.168.1.2:4220").expect("couldn't bind to address"),
+        out_arr: [0; 6144]
     };
+
+    matrix_ctr.begin();
+    matrix_ctr.set_all_black();
+    
 }
 
 fn test_clock(){

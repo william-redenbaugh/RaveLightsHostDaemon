@@ -1,17 +1,22 @@
 use std::net::UdpSocket;
 
 pub struct MatrixControl{
-    pub socket:UdpSocket,
-    // At must we support 500 neopixels, so 1500 bytes of
-    //  information on the led array with some wiggle room 
-    pub data_arr: Vec<u8>, 
-    pub num_pixels: u16
+    pub socket:UdpSocket, 
+    pub out_arr: [u8; 6144]
 }
 
 impl MatrixControl {
-    pub fn begin(&self){
-        for _i in 0..(self.num_pixels * 3 + 99){
-            self.data_arr.push(0);
+    pub fn begin(&mut self){
+        // Sets all values to zero, and pushes off the udp send command
+        self.set_all_black();
+        self.socket.send_to(&self.out_arr, "192.168.1.24:4210").expect("couldn't send data");
+    }
+
+    
+    // Allows us to set all values to black
+    pub fn set_all_black(&mut self){
+        for x in 0..6144{
+            self.out_arr[x] = 0; 
         }
     }
 }
