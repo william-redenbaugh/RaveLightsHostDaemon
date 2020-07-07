@@ -37,15 +37,15 @@ impl MatrixControl{
                 .expect("Message couldn't write properly");
             
             let msg_fill = out.into_boxed_slice();
+
             // Fills in the message data that will
             // Indiciate what type of message this is!
-            for x in 0.. (msg_fill.len()).into(){
+            for x in 0.. (msg_fill.len()){
                 self.out_arr[x] = msg_fill[x];
             }
         }
         
         // Sets all values to zero, and pushes off the udp send command
-        self.set_all_black();
         self.update();
     }
     
@@ -62,13 +62,6 @@ impl MatrixControl{
         self.out_arr[spot] = _g; 
         spot = spot + 1;
         self.out_arr[spot] = _b;
-    }
-
-    // Allows us to set all values to black
-    pub fn set_all_black(&mut self){
-        for x in 0..(self.x_len as usize * self.y_len as usize * 3){
-            self.out_arr[x] = 0; 
-        }
     }
 
     pub fn update(&self){
