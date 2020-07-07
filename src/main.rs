@@ -5,20 +5,30 @@ mod heart_control;
 mod matrix_control; 
 
 fn main() {
+    test_matrix();
     test_heart();
     test_clock();
-    test_strip();
-
 }
 
-fn test_strip(){
-    let mut matrix_ctr = matrix_control::MatrixControl{
-       socket: UdpSocket::bind("192.168.1.2:4220").expect("couldn't bind to address"),
-        out_arr: [0; 6144]
+fn test_matrix(){
+    // Address and port information for our Matrix
+    let matrix_addr_port = String::from("192.168.1.8:4220");
+    let mut matrix = matrix_control::MatrixControl{
+        socket: UdpSocket::bind(&matrix_addr_port).expect("couldn't bind to address"),
+        out_arr: [0; 6144], 
+        address_port: matrix_addr_port
     };
 
-    matrix_ctr.begin();
-    matrix_ctr.set_all_black();
+    matrix.begin();
+    
+    for x in 0..64{
+        for y in 0..32{
+            matrix.set_led(x, y, 100, 100, 100);
+        }
+    }
+
+    matrix.update();
+    matrix.set_all_black();
     
 }
 
@@ -53,4 +63,8 @@ fn test_heart(){
     
     heart_control.unlock();
     heart_control.lamp_off();
+    heart_control.lamp_on();
+    heart_control.lock();
+    heart_control.toggle_lamp();
+    heart_control.beep();
 }
