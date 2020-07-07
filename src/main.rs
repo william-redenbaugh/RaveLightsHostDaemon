@@ -13,10 +13,20 @@ fn main() {
 fn test_matrix(){
     // Address and port information for our Matrix
     let matrix_addr_port = String::from("192.168.1.8:4220");
+    
+    // Generates the array that we will save out matrix data in. 
+    // On the heap, then ownership will be passed to MatrixController. 
+    let matrix_arr: Vec<u8> = vec![0; 6144];
+    let matrix_arr_cnv = matrix_arr.into_boxed_slice();
+    
+    // Creates matrix object with defined size, passing in the array 
+    // Size of choice. 
     let mut matrix = matrix_control::MatrixControl{
         socket: UdpSocket::bind(&matrix_addr_port).expect("couldn't bind to address"),
-        out_arr: [0; 6144], 
-        address_port: matrix_addr_port
+        address_port: matrix_addr_port,
+        out_arr: matrix_arr_cnv, 
+        x_len: 64, 
+        y_len: 32 
     };
 
     matrix.begin();

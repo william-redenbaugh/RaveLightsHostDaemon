@@ -1,12 +1,15 @@
 use std::net::UdpSocket;
 
+// Matrix Controller Object for the 64 by 32 panel. 
 pub struct MatrixControl{
-    pub socket:UdpSocket, 
-    pub out_arr: [u8; 6144], 
-    pub address_port: String
+    pub socket:UdpSocket,  
+    pub address_port: String,
+    pub out_arr: Box<[u8]>,
+    pub x_len: u8, 
+    pub y_len: u8
 }
 
-impl MatrixControl {
+impl MatrixControl{
     // Since we are going to be modifying values to a class, this is how we do it!
     pub fn begin(&mut self){
         // Sets all values to zero, and pushes off the udp send command
@@ -15,11 +18,11 @@ impl MatrixControl {
     }
     
     pub fn set_led(&mut self, _x: u8, _y: u8, _r: u8, _g: u8, _b: u8){
-        if (_x >= 64)  & (_y >= 32) {
+        if (_x >= self.x_len)  & (_y >= self.y_len) {
             return;
         }
 
-        let mut spot: usize = (_y * 64 + _x * 3 + 16).into(); 
+        let mut spot: usize = ((_y * self.x_len + _x) * 3 + 16).into(); 
        
         // Sets our out array spots
         self.out_arr[spot] = _r;
@@ -31,7 +34,7 @@ impl MatrixControl {
 
     // Allows us to set all values to black
     pub fn set_all_black(&mut self){
-        for x in 0..6144{
+        for x in 0..(self.x_len * self.y_len * 3).into(){
             self.out_arr[x] = 0; 
         }
     }
