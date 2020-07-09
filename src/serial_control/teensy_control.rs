@@ -5,9 +5,17 @@ use quick_protobuf::Writer;
 // Messagedata protobuffer message
 use crate::messagedata; 
 
+extern crate serial;
+use std::io::prelude::*;
+use serial::prelude::*;
+
 pub struct SerialStripControl{
+    // Out Array For Dealing with Serial TTY Port Stuff
     pub out_arr: Box<[u8]>,
-    pub len: u32 
+    // Length of array
+    pub len: u32,
+    // Serial port passover
+    pub serial_port: serial::unix::TTYPort
 }
 
 impl SerialStripControl{
@@ -42,6 +50,18 @@ impl SerialStripControl{
                 self.out_arr[x] = msg_fill[x];
             }
         }
+        
+        // Configure Serial settings. 
+        const SETTINGS: serial::PortSettings = serial::PortSettings {
+            baud_rate:    serial::Baud115200,
+            char_size:    serial::Bits8,
+            parity:       serial::ParityNone,
+            stop_bits:    serial::Stop1,
+            flow_control: serial::FlowNone,
+        };
+        self.serial_port.configure(&SETTINGS); 
+        
+        self.update();
     }
 
     pub fn set_led(&mut self, _led: u32, _r: u8, _g: u8, _b: u8 ){
@@ -54,5 +74,9 @@ impl SerialStripControl{
         self.out_arr[spot] = _g; 
         spot = spot + 1;
         self.out_arr[spot] = _b;
+    }
+
+    pub fn update(&mut self){
+        self.serial_port.write(&self.out_arr);
     }
 }

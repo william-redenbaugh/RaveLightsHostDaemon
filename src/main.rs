@@ -13,12 +13,17 @@ use udp_control::{heart_control, matrix_control, clock_control};
 mod serial_control; 
 use serial_control::{teensy_control};
 
+// Serial module that we are using
+extern crate serial;
+use std::io::prelude::*;
+use serial::prelude::*;
+
 // Protobuffer Messages
 mod protobuf;
 use protobuf::messagedata;
 
 fn main() {
-    test_matrix();
+    //test_matrix();
     test_strip();
     //test_heart();
     //test_clock();
@@ -42,7 +47,6 @@ fn test_matrix(){
         x_len: 64, 
         y_len: 32 
     };
-
     matrix.begin();
     
     for x in 0..64{
@@ -56,11 +60,20 @@ fn test_matrix(){
 }
 
 fn test_strip(){
-    // Serial port information
-    let teensy_port = serialport::new("COM9", 115200)
-        .timeout(Duration::from_millis(10))
-        .open();
     
+    // Generate Port with specific settings 
+    let mut port = serial::open("/dev/ttyAMA0").unwrap();
+
+    // Generates the array that we will save out matrix data in. 
+    // On the heap, then ownership will be passed to MatrixController. 
+    let matrix_arr: Vec<u8> = vec![0; 1000];
+    let matrix_arr_cnv = matrix_arr.into_boxed_slice();
+
+    let teensy = teensy_control::SerialStripControl{
+        out_arr: matrix_arr_cnv, 
+        len: 288, 
+        serial_port: port
+    };
 }
 
 fn test_clock(){
