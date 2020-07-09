@@ -1,11 +1,25 @@
+// Rust's Files
 use std::net::UdpSocket;
 use std::{thread, time};
-mod clock_control;
-mod heart_control;
-mod matrix_control; 
+use std::time::Duration;
+
+// Our UDP Control files 
+// That let us control the devices on our wifi network
+mod udp_control; 
+use udp_control::{heart_control, matrix_control, clock_control};
+
+// Serial control files. 
+// Lets us control devices on the local serial interface
+mod serial_control; 
+use serial_control::{teensy_control};
+
+// Protobuffer Messages
+mod protobuf;
+use protobuf::messagedata;
 
 fn main() {
     test_matrix();
+    test_strip();
     //test_heart();
     //test_clock();
 }
@@ -38,6 +52,14 @@ fn test_matrix(){
     }
 
     matrix.update();
+    
+}
+
+fn test_strip(){
+    // Serial port information
+    let teensy_port = serialport::new("COM9", 115200)
+        .timeout(Duration::from_millis(10))
+        .open();
     
 }
 

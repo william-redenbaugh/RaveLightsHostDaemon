@@ -6,8 +6,8 @@ use quick_protobuf::Writer;
 // Standard UDP socket library
 use std::net::UdpSocket;
 
-// Message data for matrix stuff!
-mod messagedata; 
+// Crate that contains our message data. 
+use crate::messagedata;
 
 // Matrix Controller Object for a variable sized panel 
 pub struct MatrixControl{
@@ -18,6 +18,7 @@ pub struct MatrixControl{
     pub y_len: u8
 }
 
+// Implementation for our matrix control module. 
 impl MatrixControl{
     // Since we are going to be modifying values to a class, this is how we do it!
     pub fn begin(&mut self){
@@ -29,17 +30,20 @@ impl MatrixControl{
             return_message: false
         };
 
+        // Scopes out the protobuff messaging so we save memory
         {
             let mut out = Vec::new();
             let mut writer = Writer::new(&mut out);
             writer
                 .write_message(&val)
                 .expect("Message couldn't write properly");
-            
+
             // Generally speaking the first 
             // Byte indicates the size of the array. 
             // But we don't require it for our purposes. 
             out.remove(0);
+
+            // Converts into a boxed pointer. 
             let msg_fill = out.into_boxed_slice();
 
             // Fills in the message data that will
@@ -53,6 +57,7 @@ impl MatrixControl{
         self.update();
     }
     
+    // Allows us to set our LEDs to a particular value
     pub fn set_led(&mut self, _x: u8, _y: u8, _r: u8, _g: u8, _b: u8){
         if (_x >= self.x_len)  & (_y >= self.y_len) {
             return;
