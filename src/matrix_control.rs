@@ -36,6 +36,10 @@ impl MatrixControl{
                 .write_message(&val)
                 .expect("Message couldn't write properly");
             
+            // Generally speaking the first 
+            // Byte indicates the size of the array. 
+            // But we don't require it for our purposes. 
+            out.remove(0);
             let msg_fill = out.into_boxed_slice();
 
             // Fills in the message data that will
