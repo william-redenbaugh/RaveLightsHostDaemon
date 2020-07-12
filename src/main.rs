@@ -20,7 +20,7 @@ use serial::prelude::*;
 
 // Protobuffer Messages
 mod protobuf;
-use protobuf::messagedata;
+use protobuf::{messagedata, general_instructions};
 
 fn main() {
     //test_matrix();

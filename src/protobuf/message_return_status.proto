@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+message ReturnMessage{
+    enum MessageStatus{
+        // If command worked properly
+        CMD_ACCEPTED = 0; 
+
+        // If command was recognized, but didn't work properly
+        CMD_FAILED = 1; 
+
+        // If command wasn't recognized
+        CMD_UNRECOGNIZED = 2; 
+
+        // If command was recognized, but isn't on this microcontroller
+        CMD_NOT_ON_DEVICE = 3;
+         
+        // If system didn't even recognize command
+        NO_CMD = 4; 
+    }
+
+    // Return message. 
+    MessageStatus message_status = 1; 
+}

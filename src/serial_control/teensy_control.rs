@@ -4,6 +4,7 @@ use quick_protobuf::Writer;
 
 // Messagedata protobuffer message
 use crate::messagedata; 
+use crate::general_instructions; 
 
 extern crate serial;
 use std::io::prelude::*;
@@ -19,8 +20,9 @@ pub struct SerialStripControl{
 }
 
 impl SerialStripControl{
+    
     // Setup the serial interface for the strip control
-    pub fn begin(&mut self){
+    pub fn begin_strip(&mut self){
         // Provides messagedata fields. 
         let val = messagedata::MessageData{
             message_size: self.len * 3 as u32, 
