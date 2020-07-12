@@ -5,7 +5,7 @@ use std::{thread, time};
 // Our UDP Control files 
 // That let us control the devices on our wifi network
 mod udp_control; 
-use udp_control::{heart_control, matrix_control, clock_control};
+use udp_control::{heart_control, matrix_control, clock_control, heaat_control};
 
 // Serial control files. 
 // Lets us control devices on the local serial interface
@@ -17,13 +17,24 @@ extern crate serial;
 
 // Protobuffer Messages
 mod protobuf;
-use protobuf::messagedata;
+use protobuf::{messagedata, heaat_message, general_instructions};
 
 fn main() {
     //test_matrix();
     _test_strip();
     //test_heart();
     //test_clock();
+}
+
+fn _test_heaat(){
+    let heaat_addr_port = String::from("192.168.1.24::4040");
+    let mut heaat_ctrl = heaat_control::HeaatControl{
+        socket: UdpSocket::bind("127.0.0.0:4050").expect("couldn't bind to address"),
+        address_port: heaat_addr_port
+    };
+
+    heaat_ctrl.set(32, 32, 32, 12);
+
 }
 
 fn _test_matrix(){
