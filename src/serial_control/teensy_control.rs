@@ -9,7 +9,7 @@ extern crate serial;
 use std::io::prelude::*;
 use serial::prelude::*;
 
-pub struct SerialStripControl{
+pub struct TeensyControl{
     // Out Array For Dealing with Serial TTY Port Stuff
     pub out_arr: Box<[u8]>,
     // Length of array
@@ -18,9 +18,10 @@ pub struct SerialStripControl{
     pub serial_port: serial::unix::TTYPort
 }
 
-impl SerialStripControl{
+// Setting up the Serial Strip stuff. 
+impl TeensyControl{
     // Setup the serial interface for the strip control
-    pub fn begin(&mut self){
+    pub fn begin_strip(&mut self){
         // Provides messagedata fields. 
         let val = messagedata::MessageData{
             message_size: self.len * 3 as u32, 
@@ -59,14 +60,15 @@ impl SerialStripControl{
             stop_bits:    serial::Stop1,
             flow_control: serial::FlowNone,
         };
-        self.serial_port.configure(&SETTINGS); 
+        let _result = self.serial_port.configure(&SETTINGS); 
         
-        self.update();
+        // Update strip
+        self.update_strip();
     }
 
     pub fn set_led(&mut self, _led: u32, _r: u8, _g: u8, _b: u8 ){
         // Spot in our array. 
-        let mut spot: usize = ((_led * 3) as usize + 16);
+        let mut spot: usize = (_led * 3) as usize + 16;
         
         // Sets our out array spots
         self.out_arr[spot] = _r;
@@ -76,7 +78,7 @@ impl SerialStripControl{
         self.out_arr[spot] = _b;
     }
 
-    pub fn update(&mut self){
-        self.serial_port.write(&self.out_arr);
+    pub fn update_strip(&mut self){
+        let _result = self.serial_port.write(&self.out_arr);
     }
 }

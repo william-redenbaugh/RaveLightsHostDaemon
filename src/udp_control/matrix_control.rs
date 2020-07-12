@@ -63,7 +63,7 @@ impl MatrixControl{
             return;
         }
 
-        let mut spot: usize = ((_y as usize * self.x_len as usize + _x as usize) * 3 + 16); 
+        let mut spot: usize = _y as usize * self.x_len as usize + _x as usize * 3 + 16; 
        
         // Sets our out array spots
         self.out_arr[spot] = _r;

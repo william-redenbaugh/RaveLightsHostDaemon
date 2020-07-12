@@ -1,7 +1,6 @@
 // Rust's Files
 use std::net::UdpSocket;
 use std::{thread, time};
-use std::time::Duration;
 
 // Our UDP Control files 
 // That let us control the devices on our wifi network
@@ -15,8 +14,6 @@ use serial_control::{teensy_control};
 
 // Serial module that we are using
 extern crate serial;
-use std::io::prelude::*;
-use serial::prelude::*;
 
 // Protobuffer Messages
 mod protobuf;
@@ -24,12 +21,12 @@ use protobuf::messagedata;
 
 fn main() {
     //test_matrix();
-    test_strip();
+    _test_strip();
     //test_heart();
     //test_clock();
 }
 
-fn test_matrix(){
+fn _test_matrix(){
     // Address and port information for our Matrix
     let matrix_addr_port = String::from("192.168.1.9:4040");
     
@@ -56,27 +53,30 @@ fn test_matrix(){
     }
 
     matrix.update();
-    
 }
 
-fn test_strip(){
+fn _test_strip(){
     
     // Generate Port with specific settings 
-    let mut port = serial::open("/dev/ttyAMA0").unwrap();
+    let port = serial::open("/dev/ttyAMA0").unwrap();
 
     // Generates the array that we will save out matrix data in. 
     // On the heap, then ownership will be passed to MatrixController. 
     let matrix_arr: Vec<u8> = vec![0; 1000];
     let matrix_arr_cnv = matrix_arr.into_boxed_slice();
 
-    let teensy = teensy_control::SerialStripControl{
+    let mut teensy = teensy_control::TeensyControl{
         out_arr: matrix_arr_cnv, 
         len: 288, 
         serial_port: port
     };
+
+    teensy.begin_strip();
+    teensy.set_led(12, 12, 12, 12);
+    teensy.update_strip();
 }
 
-fn test_clock(){
+fn _test_clock(){
 
     // Construct our object. 
     let clk_control = clock_control::ClockControl{
@@ -93,7 +93,7 @@ fn test_clock(){
     thread::sleep(one_seccond);
 }
 
-fn test_heart(){
+fn _test_heart(){
     // Construct our heart. 
     let heart_control = heart_control::HeartControl{
         socket: UdpSocket::bind("192.168.1.2:4280").expect("couldn't bind to address")
