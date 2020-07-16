@@ -1,0 +1,10 @@
+syntax = "proto3"; 
+
+message TempuratureHumidityMessage{
+    // Fairly obvious how this works I hope 
+    float tempurature_c = 1; 
+    float humiditiy_relative = 2; 
+
+    // Whether or not the microcontroller has deemed it's reporting valid data. 
+    bool valid_data = 3; 
+}

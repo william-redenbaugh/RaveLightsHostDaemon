@@ -16,7 +16,18 @@ message MessageData{
         LED_STRIP_DATA = 2;
 
         // Heaat RGB Light Control Data. 
-        HEAAT_CONTROL_DATA = 3; 
+        HEAAT_CONTROL_DATA = 3;
+
+        // Relay message data. 
+        RELAY_MESSAGE_DATA = 4; 
+
+        // Status message data 
+        STATUS_DATA = 5; 
+
+        // Tempurature Data
+        TEMP_HUM_DATA = 6;    
+
+        DATA_REQ = 7; 
     }
 
     MessageType message_type = 2;

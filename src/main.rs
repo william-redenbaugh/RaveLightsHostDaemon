@@ -5,7 +5,7 @@ use std::{thread, time};
 // Our UDP Control files 
 // That let us control the devices on our wifi network
 mod udp_control; 
-use udp_control::{heart_control, matrix_control, clock_control, heaat_control};
+use udp_control::{heart_control, matrix_control, clock_control, heaat_control, relay_control};
 
 // Serial control files. 
 // Lets us control devices on the local serial interface
@@ -17,13 +17,34 @@ extern crate serial;
 
 // Protobuffer Messages
 mod protobuf;
-use protobuf::{messagedata, heaat_message, general_instructions};
+use protobuf::{messagedata, heaat_message, general_instructions, relay_msg};
+
+extern crate yahoo_finance; 
+use yahoo_finance::history;
 
 fn main() {
+    test_finance();
     //test_matrix();
-    _test_strip();
+    //_test_strip();
     //test_heart();
     //test_clock();
+    // test_heaat();
+    // test_relay();
+}
+
+fn test_finance(){
+    test_matrix();   
+}
+
+fn _test_relay(){
+    let relay_addr_port = String::from("192.168.1.24::4040");
+    let mut relay_ctrl = relay_control::RelayControl{
+        socket: UdpSocket::bind("127.0.0.0:4050").expect("couldn't bind to address"),
+        address_port: relay_addr_port
+    };
+
+    relay_ctrl.set(false);
+    relay_ctrl.set(true);
 }
 
 fn _test_heaat(){

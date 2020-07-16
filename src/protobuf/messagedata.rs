@@ -8,7 +8,6 @@
 #![allow(clippy::all)]
 #![cfg_attr(rustfmt, rustfmt_skip)]
 
-extern crate quick_protobuf; 
 
 use quick_protobuf::{MessageRead, MessageWrite, BytesReader, Writer, WriterBackend, Result};
 use quick_protobuf::sizeofs::*;
@@ -62,6 +61,10 @@ pub enum MessageType {
     MATRIX_DATA = 1,
     LED_STRIP_DATA = 2,
     HEAAT_CONTROL_DATA = 3,
+    RELAY_MESSAGE_DATA = 4,
+    STATUS_DATA = 5,
+    TEMP_HUM_DATA = 6,
+    DATA_REQ = 7,
 }
 
 impl Default for MessageType {
@@ -77,6 +80,10 @@ impl From<i32> for MessageType {
             1 => MessageType::MATRIX_DATA,
             2 => MessageType::LED_STRIP_DATA,
             3 => MessageType::HEAAT_CONTROL_DATA,
+            4 => MessageType::RELAY_MESSAGE_DATA,
+            5 => MessageType::STATUS_DATA,
+            6 => MessageType::TEMP_HUM_DATA,
+            7 => MessageType::DATA_REQ,
             _ => Self::default(),
         }
     }
@@ -89,6 +96,10 @@ impl<'a> From<&'a str> for MessageType {
             "MATRIX_DATA" => MessageType::MATRIX_DATA,
             "LED_STRIP_DATA" => MessageType::LED_STRIP_DATA,
             "HEAAT_CONTROL_DATA" => MessageType::HEAAT_CONTROL_DATA,
+            "RELAY_MESSAGE_DATA" => MessageType::RELAY_MESSAGE_DATA,
+            "STATUS_DATA" => MessageType::STATUS_DATA,
+            "TEMP_HUM_DATA" => MessageType::TEMP_HUM_DATA,
+            "DATA_REQ" => MessageType::DATA_REQ,
             _ => Self::default(),
         }
     }
