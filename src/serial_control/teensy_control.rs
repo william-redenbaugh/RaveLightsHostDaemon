@@ -2,24 +2,66 @@
 extern crate quick_protobuf; 
 use quick_protobuf::Writer; 
 
-// Messagedata protobuffer message
-use crate::messagedata; 
-
+// Serial crate
 extern crate serial;
 use std::io::prelude::*;
 use serial::prelude::*;
 
+// Internal Protobuffer Crate for
+// our own messagess
+use crate::messagedata; 
+
+// Refcel and Rc stuff so we can have multiple pointers to the same stuff
+// Will be used for sharing a single serial object across multiple "objects", that will be found
+// 
+use std::rc::Rc;
+use std::cell::{Cell, RefCell};
+
+pub fn new_teensy_control(port_ref: Rc<RefCell<serial::unix::TTYPort>>) -> TeensyControl{
+    let teensy = TeensyControl{
+        serial_port: port_ref
+    };
+
+    return teensy;
+}
+
+pub fn new_serial_strip(num_leds: u32, port_ref: Rc<RefCell<serial::unix::TTYPort>>) -> StripControl{
+    let arr_size = (16 + 3 * num_leds) as usize;
+
+    // Generates the array that we will save out matrix data in. 
+    // On the heap, then ownership will be passed to MatrixController. 
+    let matrix_arr: Vec<u8> = vec![0; arr_size];
+    let matrix_arr_cnv = matrix_arr.into_boxed_slice();
+
+    let strip_control = StripControl{
+        out_arr: matrix_arr_cnv, 
+        len: num_leds, 
+        serial_port: port_ref
+    };
+
+    return strip_control; 
+}
+
 pub struct TeensyControl{
+    // Serial port passover
+    pub serial_port: Rc<RefCell<serial::unix::TTYPort>>
+}
+
+impl TeensyControl{
+    
+}
+
+pub struct StripControl{
     // Out Array For Dealing with Serial TTY Port Stuff
     pub out_arr: Box<[u8]>,
     // Length of array
     pub len: u32,
     // Serial port passover
-    pub serial_port: serial::unix::TTYPort
+    pub serial_port: Rc<RefCell<serial::unix::TTYPort>>
 }
 
 // Setting up the Serial Strip stuff. 
-impl TeensyControl{
+impl StripControl{
     // Setup the serial interface for the strip control
     pub fn begin_strip(&mut self){
         // Provides messagedata fields. 
@@ -52,16 +94,6 @@ impl TeensyControl{
             }
         }
         
-        // Configure Serial settings. 
-        const SETTINGS: serial::PortSettings = serial::PortSettings {
-            baud_rate:    serial::Baud115200,
-            char_size:    serial::Bits8,
-            parity:       serial::ParityNone,
-            stop_bits:    serial::Stop1,
-            flow_control: serial::FlowNone,
-        };
-        let _result = self.serial_port.configure(&SETTINGS); 
-        
         // Update strip
         self.update_strip();
     }
@@ -79,6 +111,6 @@ impl TeensyControl{
     }
 
     pub fn update_strip(&mut self){
-        let _result = self.serial_port.write(&self.out_arr);
+        let _result = self.serial_port.borrow_mut().write(&self.out_arr);
     }
 }

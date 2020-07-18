@@ -9,9 +9,13 @@ use std::net::UdpSocket;
 // Crate that contains our message data. 
 use crate::messagedata;
 
+// Refcel and Rc stuff so we can have multiple pointers to the same stuff
+use std::rc::Rc;
+use std::cell::{Cell, RefCell};
+
 // Matrix Controller Object for a variable sized panel 
 pub struct MatrixControl{
-    pub socket:UdpSocket,  
+    pub socket: Rc<RefCell<UdpSocket>>,  
     pub address_port: String,
     pub out_arr: Box<[u8]>,
     pub x_len: u8, 
@@ -74,6 +78,6 @@ impl MatrixControl{
     }
 
     pub fn update(&self){
-        self.socket.send_to(&self.out_arr, &self.address_port).expect("couldn't send data");       
+        self.socket.borrow_mut().send_to(&self.out_arr, &self.address_port).expect("couldn't send data");       
     }
 }
