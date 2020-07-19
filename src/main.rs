@@ -17,7 +17,7 @@ use udp_control::{heart_control, matrix_control, clock_control, heaat_control, r
 // Serial control files. 
 // Lets us control devices on the local serial interface
 mod serial_control; 
-use serial_control::{teensy_control};
+use serial_control::{teensy_control, strip_control};
 
 // Serial module that we are using
 extern crate serial;
@@ -38,5 +38,5 @@ fn main() {
     let teensy = teensy_control::new_teensy_control(Rc::clone(&port_ref));
 
     // Create our "teensy strip controller"
-    let teensy_strip = teensy_control::new_serial_strip(288, Rc::clone(&port_ref));
+    let teensy_strip = strip_control::new_serial_strip(288, Rc::clone(&port_ref));
 }

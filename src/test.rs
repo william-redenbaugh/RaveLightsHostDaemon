@@ -29,7 +29,6 @@ use protobuf::{messagedata, heaat_message, general_instructions, relay_msg};
 extern crate yahoo_finance; 
 use yahoo_finance::history;
 
-
 fn multi_thread_one(){
     _test_heart();
 }
@@ -93,23 +92,10 @@ fn test_matrix(){
     
     // Reference to our socket
     let socket = UdpSocket::bind("127.0.0.0:4050").expect("couldn't bind to address");
-    let socket_ref = Rc::new(RefCell::new(socket));
-
-    // Generates the array that we will save out matrix data in. 
-    // On the heap, then ownership will be passed to MatrixController. 
-    let matrix_arr: Vec<u8> = vec![0; 7000];
-    let matrix_arr_cnv = matrix_arr.into_boxed_slice();
     
     // Creates matrix object with defined size, passing in the array 
     // Size of choice. 
-    let mut matrix = matrix_control::MatrixControl{
-        socket: Rc::clone(&socket_ref),
-        address_port: matrix_addr_port,
-        out_arr: matrix_arr_cnv, 
-        x_len: 64, 
-        y_len: 32 
-    };
-
+    let mut matrix = matrix_control::new_matrix_control(Rc::clone(&socket_ref), 64, 32, matrix_addr_port);
     matrix.begin();
     for x in 0..64{
         for y in 0..32{

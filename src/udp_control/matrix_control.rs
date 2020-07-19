@@ -22,6 +22,24 @@ pub struct MatrixControl{
     pub y_len: u8
 }
 
+pub fn new_matrix_control(port_ref: Rc<RefCell<UdpSocket>>, x_len: u8, y_len: u8, address_port: String) -> MatrixControl{
+    // Generates the array that we will save out matrix data in. 
+    // On the heap, then ownership will be passed to MatrixController. 
+    let matrix_arr: Vec<u8> = vec![0; (x_len * y_len * 3 + 200) as usize];
+    let matrix_arr_cnv = matrix_arr.into_boxed_slice();
+
+    // Creates matrix control object to be returned as the function
+    let matrix_control = MatrixControl{
+        socket:port_ref, 
+        address_port: address_port, 
+        out_arr: matrix_arr_cnv, 
+        x_len: x_len, 
+        y_len: y_len   
+    };
+
+    return matrix_control;
+}
+
 // Implementation for our matrix control module. 
 impl MatrixControl{
     // Since we are going to be modifying values to a class, this is how we do it!
