@@ -6,6 +6,8 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 
+// Incluide the standard libraries for input and output along with serial control.
+
 use std::io::prelude::*;
 use serial::prelude::*;
 
@@ -26,17 +28,62 @@ extern crate serial;
 mod protobuf;
 use protobuf::{messagedata, heaat_message, general_instructions, relay_msg};
 
+// Whenever we deal with yahoo finance stuff it will get it's details and implementation from yahoo finance. 
 extern crate yahoo_finance; 
 use yahoo_finance::history;
 
-fn main() {
-    // Setup control with teensy over Serial port. 
-    let mut p = serial::open("/dev/ttyAMA0").unwrap();
-    let port_ref = Rc::new(RefCell::new(p));
-    
-    // Teensy Controller object
-    let teensy = teensy_control::new_teensy_control(Rc::clone(&port_ref));
+// Importing the CLI libraries for dealing with keyboard inputs
+mod cli; 
+use cli::{cli_main};
 
-    // Create our "teensy strip controller"
-    let teensy_strip = strip_control::new_serial_strip(288, Rc::clone(&port_ref));
+// Importing the device manager libraries. 
+mod device_manager;
+use device_manager::main_device_manager;
+
+fn main() {   
+    
+    // Messaging for our matrix
+    let (matrix_rx, rx) = mpsc::channel();
+    let (tx, matrix_tx) = mpsc::channel();
+    // Generate the thread to control our led matrix 
+    let matrix_main_handle = thread::spawn(move || {
+        main_device_manager::matrix_main(rx, tx);    
+    });
+    
+    // Messaging for our teensy controll
+    let (teensy_rx, rx) = mpsc::channel();
+    let (tx, teensy_tx) = mpsc::channel();
+    // Generate the thread to control our main teensy 
+    let teensy_main_handle = thread::spawn(move || {
+        main_device_manager::teensy_main(rx, tx);
+    });
+
+    // Setting up the messaging for our tempurature channel
+    let (temp_rx, rx) = mpsc::channel();
+    let (tx, temp_tx) = mpsc::channel();
+    let temp_main_handle = thread::spawn(move || {
+        main_device_manager::temp_main(rx, tx);
+    });
+
+    // Passing over the channels to the cli thread. d
+    let cli_setup = cli_main::CLISetupStruct{
+        matrix_rx: matrix_rx,
+        matrix_tx: matrix_tx,
+        teensy_rx: teensy_rx,
+        teensy_tx: teensy_tx,
+        temp_rx: temp_rx, 
+        temp_tx: temp_tx
+    };
+
+    // Setting up the threading for our CLI
+    let cli_handle = thread::spawn(move || {
+        cli_main::cli_main(cli_setup);   
+    });
+    
+    // Since we spawn everything in threads, 
+    // We just wait on our threads to finish.
+    cli_handle.join();
+    temp_main_handle.join();
+    matrix_main_handle.join();
+    teensy_main_handle.join();
 }

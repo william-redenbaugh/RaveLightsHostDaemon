@@ -56,11 +56,9 @@ fn test_multithreading(){
 
     let handle_one = thread::spawn(move || {
         loop{
-            {
-                let mut num = counter.lock().unwrap();
-                *num += 1; 
-                println!("Number from thread zero: {}", *num);
-            }
+            let mut num = counter.lock().unwrap();
+            *num += 1; 
+            println!("Number from thread zero: {}", *num);
             thread::sleep(Duration::from_millis(1000));
         }
     });
