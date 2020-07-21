@@ -32,6 +32,19 @@ pub struct TimerReturnPacket{
 }
 pub fn timer_main(timer_set: TimerSetupStruct){
     loop{
+        
         thread::sleep(Duration::from_millis(1000));
+        let msg = main_device_manager::HeartClockMessagePacket{
+            msg_type: main_device_manager::ClockControlMsg::CLOCK_EN,
+            val: true
+        };
+        timer_set.hc_rx.send(msg).unwrap();
+
+        thread::sleep(Duration::from_millis(1000));
+        let msg = main_device_manager::HeartClockMessagePacket{
+            msg_type: main_device_manager::ClockControlMsg::CLOCK_EN,
+            val: false
+        };
+        timer_set.hc_rx.send(msg).unwrap();
     }
 }
