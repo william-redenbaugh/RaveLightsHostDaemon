@@ -49,6 +49,13 @@ use cloud::cloud_main;
 
 fn main() {   
     
+    // Messaging thread for our heart and clock devices
+    let (hc_rx, rx) = mpsc::channel();
+    let (tx, hc_tx) = mpsc::channel();
+    let heart_clock_handle = std::thread::spawn(move || {
+        main_device_manager::heart_clock_control(rx, tx);
+    });
+
     // Messaging for our matrix
     let (matrix_rx, rx) = mpsc::channel();
     let (tx, matrix_tx) = mpsc::channel();
@@ -78,7 +85,8 @@ fn main() {
     let timer_setup = timer_main::TimerSetupStruct{
         matrix_rx: matrix_rx.clone(), 
         teensy_rx: teensy_rx.clone(), 
-        temp_rx: temp_rx.clone()
+        temp_rx: temp_rx.clone(), 
+        hc_rx: hc_rx.clone()
     };
 
     // Generate the thread handler for our timer functions
@@ -95,7 +103,9 @@ fn main() {
         teensy_rx: teensy_rx.clone(),
         teensy_tx: teensy_tx,
         temp_rx: temp_rx.clone(), 
-        temp_tx: temp_tx
+        temp_tx: temp_tx, 
+        hc_rx: hc_rx.clone(), 
+        hc_tx: hc_tx
     };
     
     // Setting up the threading for our CLI
@@ -108,7 +118,8 @@ fn main() {
     let cloud_setup = cloud_main::CloudSetupStruct{
         matrix_rx: matrix_rx, 
         teensy_rx: teensy_rx, 
-        temp_rx: temp_rx
+        temp_rx: temp_rx, 
+        hc_rx: hc_rx.clone()
     };
 
     let cloud_handle = std::thread::spawn(move || {
@@ -125,4 +136,5 @@ fn main() {
     teensy_main_handle.join();
     cloud_handle.join();
     timer_handle.join();
+    heart_clock_handle.join();
 }

@@ -20,7 +20,9 @@ pub struct CloudSetupStruct{
     pub teensy_rx: mpsc::Sender<main_device_manager::TeensyMessagePacket>,
     
     // Control of our relayboards that deal with my thermometer. 
-    pub temp_rx: mpsc::Sender<main_device_manager::RelayMessagePacket>
+    pub temp_rx: mpsc::Sender<main_device_manager::RelayMessagePacket>, 
+
+    pub hc_rx: mpsc::Sender<main_device_manager::HeartClockMessagePacket>
 }
 
 pub fn cloud_main(cloud: CloudSetupStruct){

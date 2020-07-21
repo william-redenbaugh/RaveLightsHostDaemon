@@ -23,7 +23,10 @@ pub struct CLISetupStruct{
 
     // Control of our relayboards that deal with my thermometer. 
     pub temp_rx: mpsc::Sender<main_device_manager::RelayMessagePacket>,
-    pub temp_tx: mpsc::Receiver<main_device_manager::RelayReturnPacket>
+    pub temp_tx: mpsc::Receiver<main_device_manager::RelayReturnPacket>, 
+
+    pub hc_rx: mpsc::Sender<main_device_manager::HeartClockMessagePacket>,
+    pub hc_tx: mpsc::Receiver<main_device_manager::HeartClockReturnPacket>
 }
 
 // function that contains our primary cli code

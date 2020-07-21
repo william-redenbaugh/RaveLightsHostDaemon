@@ -91,3 +91,84 @@ pub fn temp_main(rx: mpsc::Receiver<RelayMessagePacket>, tx: mpsc::Sender<RelayR
         }
     }
 }
+
+// Enumarted values representing
+// The instructions that we are giving this thread. 
+enum ClockControlMsg{
+    CLOCK_EN, 
+    HEART_SLEEP,
+    HEART_LOCK, 
+    HEART_LAMP, 
+    HEART_BEEP
+}
+pub struct HeartClockMessagePacket{
+    msg_type: ClockControlMsg,
+    val: bool
+}
+pub struct HeartClockReturnPacket{
+    request_status: bool
+}
+pub fn heart_clock_control(rx: mpsc::Receiver<HeartClockMessagePacket>, tx: mpsc::Sender<HeartClockReturnPacket>){
+    // Strings containing the ip address and ports for our UDP control devices
+    // These devices in particular don't use any particular data serialization format, 
+    // So we just send a preset array over the internet that represents a 
+    // command on the other side. 
+    let clock_control_ip_addr_port = String::from("192.168.1.24:4210"); 
+    let heart_control_ip_addr_port = String::from("192.168.1.42:4250");
+    
+    let clock_control = udp_control::clock_control::ClockControl{
+        socket: UdpSocket::bind("127.0.0.0:4050").expect("couldn't bind to address"), 
+        address_port: clock_control_ip_addr_port
+    };
+
+    let heart_control = udp_control::heart_control::HeartControl{
+        socket: UdpSocket::bind("127.0.0.0:4020").expect("Could not bind to address"),
+        address_port: heart_control_ip_addr_port
+    };
+
+    clock_control.off();
+    clock_control.off();
+
+    // Loop through everything. 
+    loop{
+        let latest_msg = rx.recv().unwrap();
+        // Which type of message are we dealing with
+        match latest_msg.msg_type{
+            CLOCK_EN =>{
+                if(latest_msg.val){
+                    clock_control.on();
+                }
+                else{
+                    clock_control.off();
+                }
+            }
+            HEART_LOCK => {
+                if(latest_msg.val){
+                    heart_control.lock(); 
+                }
+                else{
+                    heart_control.unlock();
+                }
+            }
+            HEART_SLEEP => {
+                if(latest_msg.val){
+                    // TODO 
+                }
+                else{
+                    // TODO
+                }
+            }
+            HEART_LAMP => {
+                if(latest_msg.val){
+                    heart_control.lamp_on();
+                }
+                else{
+                    heart_control.lamp_off();
+                }
+            }
+            HEART_BEEP =>{
+                heart_control.beep();
+            }
+        }
+    }
+}

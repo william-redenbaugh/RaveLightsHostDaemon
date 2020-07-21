@@ -2,18 +2,19 @@ use std::net::UdpSocket;
 
 // Object constructor udp control of the clock
 pub struct ClockControl{
-    pub off_cmd: [u8; 5],
-    pub on_cmd: [u8; 5], 
-    pub socket:UdpSocket
+    pub socket:UdpSocket, 
+    pub address_port: String
 }
 
 // Implementation for the UDP control of the clock
 impl ClockControl{
     pub fn on(&self){
-        self.socket.send_to(&self.on_cmd, "192.168.1.24:4210").expect("couldn't send data");
+        let on_cmd: [u8; 5] = [40, 40, 50, 65, 0]; 
+        self.socket.send_to(&on_cmd, &self.address_port).expect("couldn't send data");
     }
 
     pub fn off(&self){
-        self.socket.send_to(&self.off_cmd, "192.168.1.24:4210").expect("couldn't send data");
+        let off_cmd: [u8; 5] = [40, 40, 50, 65, 1];
+        self.socket.send_to(&off_cmd, &self.address_port).expect("couldn't send data");
     }
 }

@@ -17,7 +17,10 @@ pub struct TimerSetupStruct{
     pub teensy_rx: mpsc::Sender<main_device_manager::TeensyMessagePacket>,
   
     // Control of our relayboards that deal with my thermometer. 
-    pub temp_rx: mpsc::Sender<main_device_manager::RelayMessagePacket>
+    pub temp_rx: mpsc::Sender<main_device_manager::RelayMessagePacket>, 
+
+    // Control of our heart and clock control devices. 
+    pub hc_rx: mpsc::Sender<main_device_manager::HeartClockMessagePacket>
 }
 
 // Messaging used to control the timer subroutines. 
