@@ -7,7 +7,6 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 
 // Incluide the standard libraries for input and output along with serial control.
-
 use std::io::prelude::*;
 use serial::prelude::*;
 
@@ -40,6 +39,14 @@ use cli::{cli_main};
 mod device_manager;
 use device_manager::main_device_manager;
 
+// All of our timer integration features.
+mod timer; 
+use timer::timer_main;
+
+// All of our cloud integration features 
+mod cloud; 
+use cloud::cloud_main; 
+
 fn main() {   
     
     // Messaging for our matrix
@@ -50,9 +57,10 @@ fn main() {
         main_device_manager::matrix_main(rx, tx);    
     });
     
-    // Messaging for our teensy controll
+    // Messaging for our teensy control
     let (teensy_rx, rx) = mpsc::channel();
     let (tx, teensy_tx) = mpsc::channel();
+
     // Generate the thread to control our main teensy 
     let teensy_main_handle = thread::spawn(move || {
         main_device_manager::teensy_main(rx, tx);
@@ -65,25 +73,56 @@ fn main() {
         main_device_manager::temp_main(rx, tx);
     });
 
-    // Passing over the channels to the cli thread. d
-    let cli_setup = cli_main::CLISetupStruct{
-        matrix_rx: matrix_rx,
-        matrix_tx: matrix_tx,
-        teensy_rx: teensy_rx,
-        teensy_tx: teensy_tx,
-        temp_rx: temp_rx, 
-        temp_tx: temp_tx
+    // Struct that will let our timer execute scheduled orders
+    // So we can have automated cloud functions
+    let timer_setup = timer_main::TimerSetupStruct{
+        matrix_rx: matrix_rx.clone(), 
+        teensy_rx: teensy_rx.clone(), 
+        temp_rx: temp_rx.clone()
     };
 
+    // Generate the thread handler for our timer functions
+    let timer_handle = std::thread::spawn(move || {
+        timer_main::timer_main(timer_setup);
+    });
+
+    // Passing over the channels to the cli thread. 
+    // So we can control our cloud integrated house 
+    // using a command line interface. 
+    let cli_setup = cli_main::CLISetupStruct{
+        matrix_rx: matrix_rx.clone(),
+        matrix_tx: matrix_tx,
+        teensy_rx: teensy_rx.clone(),
+        teensy_tx: teensy_tx,
+        temp_rx: temp_rx.clone(), 
+        temp_tx: temp_tx
+    };
+    
     // Setting up the threading for our CLI
     let cli_handle = thread::spawn(move || {
         cli_main::cli_main(cli_setup);   
     });
     
+    // Struct that will allow our cloud integration thread
+    // to issue commands to our device manipulation threads
+    let cloud_setup = cloud_main::CloudSetupStruct{
+        matrix_rx: matrix_rx, 
+        teensy_rx: teensy_rx, 
+        temp_rx: temp_rx
+    };
+
+    let cloud_handle = std::thread::spawn(move || {
+        cloud_main::cloud_main(cloud_setup);
+    });
+
     // Since we spawn everything in threads, 
     // We just wait on our threads to finish.
+    // In theory since all of our threads 
+    // 
     cli_handle.join();
     temp_main_handle.join();
     matrix_main_handle.join();
     teensy_main_handle.join();
+    cloud_handle.join();
+    timer_handle.join();
 }

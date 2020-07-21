@@ -9,6 +9,9 @@ use std::cell::{Cell, RefCell};
 // Since the structs for sending the information come from the "main device manager" thread
 use crate::main_device_manager;
 
+// Import scheduler program files 
+use crate::timer; 
+
 pub struct CLISetupStruct{
     // Control of our main matrix control teensy board for the cli 
     pub matrix_rx: mpsc::Sender<main_device_manager::MatrixMessagePacket>,
@@ -25,7 +28,6 @@ pub struct CLISetupStruct{
 
 // function that contains our primary cli code
 pub fn cli_main(cli_set: CLISetupStruct){
-    
     loop{
         thread::sleep(Duration::from_millis(1000));
         let teensy_msg = main_device_manager::MatrixMessagePacket{debug: true};
