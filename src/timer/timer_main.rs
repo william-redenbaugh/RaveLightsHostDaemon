@@ -55,8 +55,8 @@ pub fn timer_main(timer_set: TimerSetupStruct){
     
     // Let's us deliver a clock off timer event 
     let clock_off_event = TimeEvent{
-        hour: 23, 
-        minute: 30, 
+        hour: 2, 
+        minute: 0, 
         day: 0,
         event: msg,
         event_exec: false
@@ -70,8 +70,8 @@ pub fn timer_main(timer_set: TimerSetupStruct){
 
     // Message event for our clock on stuff
     let clock_on_event = TimeEvent{
-        hour: 23, 
-        minute: 30, 
+        hour: 9, 
+        minute: 20, 
         day: 0,
         event: msg,
         event_exec: false
