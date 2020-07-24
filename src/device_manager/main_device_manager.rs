@@ -94,6 +94,7 @@ pub fn temp_main(rx: mpsc::Receiver<RelayMessagePacket>, tx: mpsc::Sender<RelayR
 
 // Enumarted values representing
 // The instructions that we are giving this thread. 
+#[derive(Clone, Debug)]
 pub enum ClockControlMsg{
     CLOCK_EN, 
     HEART_SLEEP,
@@ -101,6 +102,7 @@ pub enum ClockControlMsg{
     HEART_LAMP, 
     HEART_BEEP
 }
+#[derive(Clone, Debug)]
 pub struct HeartClockMessagePacket{
     pub msg_type: ClockControlMsg,
     pub val: bool

@@ -1,6 +1,5 @@
 // The protobuffer crage that we are using
 extern crate quick_protobuf; 
-extern crate time;
 
 // Protobuffer writing module
 use quick_protobuf::Writer;

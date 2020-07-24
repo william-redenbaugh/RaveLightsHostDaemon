@@ -1092,10 +1092,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "udp_comm_test"
 version = "0.1.0"
 dependencies = [
+ "chrono 0.4.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-protobuf 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.56 (registry+https://github.com/rust-lang/crates.io-index)",
  "serial 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.2.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "yahoo-finance 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
