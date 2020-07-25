@@ -173,3 +173,20 @@ pub fn heart_clock_control(rx: mpsc::Receiver<HeartClockMessagePacket>, tx: mpsc
         }
     }
 }
+
+pub fn clock_off_msg() -> HeartClockMessagePacket{
+    let msg = HeartClockMessagePacket{
+        msg_type: ClockControlMsg::CLOCK_EN,
+        val: false
+    };
+    return msg; 
+}
+
+
+pub fn clock_on_msg() -> HeartClockMessagePacket{
+    let msg = HeartClockMessagePacket{
+        msg_type: ClockControlMsg::CLOCK_EN,
+        val: true
+    };
+    return msg; 
+}

@@ -11,6 +11,7 @@ use crate::main_device_manager;
 
 use chrono::{Datelike, Timelike, Utc};
 
+// Struct that gives us all the information to control this stuff
 pub struct TimerSetupStruct{
     // Control of our main matrix control teensy board for the cli 
     pub matrix_rx: mpsc::Sender<main_device_manager::MatrixMessagePacket>,
@@ -29,10 +30,14 @@ pub struct TimerSetupStruct{
 pub struct TimerMessagePacket{
     pub debug: bool
 }
+// Should we ask anything of the timer message, that 
+// Information should go here :0
 pub struct TimerReturnPacket{
     pub debug: bool
 }
 
+// General purpose time event that 
+// Let's us help schedule our events 
 pub struct TimeEvent<T>{
     pub hour: u8, 
     pub minute: u8,
@@ -41,31 +46,21 @@ pub struct TimeEvent<T>{
     pub event: T
 }
 pub fn timer_main(timer_set: TimerSetupStruct){
+    // Used for helping deal with our periodic functions 
+    // So we make sure events only trigger once. 
+    let mut timer_reset: bool = false; 
 
     // All events involving clock time events will be placed in this 
     // Vector array
     let mut clock_time_events = Vec::new();
-    let mut timer_reset: bool = false; 
 
-    // We want two types of messages to be send to the device. 
-    let msg = main_device_manager::HeartClockMessagePacket{
-        msg_type: main_device_manager::ClockControlMsg::CLOCK_EN,
-        val: false
-    };
-    
     // Let's us deliver a clock off timer event 
     let clock_off_event = TimeEvent{
         hour: 2, 
         minute: 0, 
         day: 0,
-        event: msg,
+        event: main_device_manager::clock_off_msg(),
         event_exec: false
-    };
-
-    // We want two types of messages to be send to the device. 
-    let msg = main_device_manager::HeartClockMessagePacket{
-        msg_type: main_device_manager::ClockControlMsg::CLOCK_EN,
-        val: true
     };
 
     // Message event for our clock on stuff
@@ -73,15 +68,16 @@ pub fn timer_main(timer_set: TimerSetupStruct){
         hour: 9, 
         minute: 20, 
         day: 0,
-        event: msg,
+        event: main_device_manager::clock_on_msg(),
         event_exec: false
     };
 
+    // Add our events to the array so we can run through and check for them 
+    // To run 
     clock_time_events.push(clock_off_event);
     clock_time_events.push(clock_on_event);
 
     loop{
-
         // Get the latest time information needed to trigger our events
         let now = Utc::now();
         let (is_pm, hour) = now.hour12();
