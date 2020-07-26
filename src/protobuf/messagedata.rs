@@ -65,6 +65,8 @@ pub enum MessageType {
     STATUS_DATA = 5,
     TEMP_HUM_DATA = 6,
     DATA_REQ = 7,
+    CLOCK_DATA = 8,
+    HEART_DATA = 9,
 }
 
 impl Default for MessageType {
@@ -84,6 +86,8 @@ impl From<i32> for MessageType {
             5 => MessageType::STATUS_DATA,
             6 => MessageType::TEMP_HUM_DATA,
             7 => MessageType::DATA_REQ,
+            8 => MessageType::CLOCK_DATA,
+            9 => MessageType::HEART_DATA,
             _ => Self::default(),
         }
     }
@@ -100,6 +104,8 @@ impl<'a> From<&'a str> for MessageType {
             "STATUS_DATA" => MessageType::STATUS_DATA,
             "TEMP_HUM_DATA" => MessageType::TEMP_HUM_DATA,
             "DATA_REQ" => MessageType::DATA_REQ,
+            "CLOCK_DATA" => MessageType::CLOCK_DATA,
+            "HEART_DATA" => MessageType::HEART_DATA,
             _ => Self::default(),
         }
     }

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message HeartControlData{
+    // Enable the sleep mode on our heart
+    bool en_sleep_mode = 1; 
+    // Enable the lamp on the heart 
+    bool en_lamp = 2; 
+    // Enable the lock mode on the heart. 
+    bool en_lock_mode = 3; 
+}

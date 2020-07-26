@@ -27,7 +27,14 @@ message MessageData{
         // Tempurature Data
         TEMP_HUM_DATA = 6;    
 
+        // Request for data. 
         DATA_REQ = 7; 
+
+        // Tina's clock present data
+        CLOCK_DATA = 8;
+
+        // Tina's heart data. 
+        HEART_DATA = 9;  
     }
 
     MessageType message_type = 2;

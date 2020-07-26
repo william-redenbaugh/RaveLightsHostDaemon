@@ -119,16 +119,14 @@ pub fn heart_clock_control(rx: mpsc::Receiver<HeartClockMessagePacket>, tx: mpsc
     let heart_control_ip_addr_port = String::from("192.168.1.42:4250");
     
     // "object" of sorts that will let us control our clock
-    let clock_control = udp_control::clock_control::ClockControl{
+    let mut clock_control = udp_control::clock_control::ClockControl{
         socket: UdpSocket::bind("127.0.0.0:4050").expect("couldn't bind to address"), 
         address_port: clock_control_ip_addr_port
     };
 
+    let heart_udp_server = UdpSocket::bind("127.0.0.0:4050").expect("couldn't bind to address"); 
     // objects of sorts that will let us control our heart. 
-    let heart_control = udp_control::heart_control::HeartControl{
-        socket: UdpSocket::bind("127.0.0.0:4020").expect("Could not bind to address"),
-        address_port: heart_control_ip_addr_port
-    };
+    let mut heart_control = udp_control::heart_control::new_heart_control(heart_udp_server, heart_control_ip_addr_port);
 
     // Loop through everything. 
     loop{

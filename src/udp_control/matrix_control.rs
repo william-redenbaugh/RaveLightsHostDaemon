@@ -44,16 +44,15 @@ pub fn new_matrix_control(port_ref: Rc<RefCell<UdpSocket>>, x_len: u8, y_len: u8
 impl MatrixControl{
     // Since we are going to be modifying values to a class, this is how we do it!
     pub fn begin(&mut self){
-        
-        // Provides messagedata fields. 
-        let val = messagedata::MessageData{
-            message_size: (self.x_len as u32 * self.y_len as u32 * 3) as u32, 
-            message_type: messagedata::mod_MessageData::MessageType::MATRIX_DATA, 
-            return_message: false
-        };
-
-        // Scopes out the protobuff messaging so we save memory
+        // Scopes out the protobuff messaging so we save memory, get the vector de
         {
+            // Provides messagedata fields. 
+            let val = messagedata::MessageData{
+                message_size: (self.x_len as u32 * self.y_len as u32 * 3) as u32, 
+                message_type: messagedata::mod_MessageData::MessageType::MATRIX_DATA, 
+                return_message: false
+            };
+            
             let mut out = Vec::new();
             let mut writer = Writer::new(&mut out);
             writer
@@ -64,14 +63,11 @@ impl MatrixControl{
             // Byte indicates the size of the array. 
             // But we don't require it for our purposes. 
             out.remove(0);
-
-            // Converts into a boxed pointer. 
-            let msg_fill = out.into_boxed_slice();
-
+            
             // Fills in the message data that will
             // Indiciate what type of message this is!
-            for x in 0.. (msg_fill.len()){
-                self.out_arr[x] = msg_fill[x];
+            for x in 0.. (out.len()){
+                self.out_arr[x] = out[x];
             }
         }
         

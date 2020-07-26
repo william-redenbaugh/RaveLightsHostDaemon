@@ -25,7 +25,14 @@ extern crate serial;
 
 // Protobuffer Messages
 mod protobuf;
-use protobuf::{messagedata, heaat_message, general_instructions, relay_msg};
+use protobuf::{ messagedata, 
+                heaat_message, 
+                general_instructions, 
+                relay_msg, 
+                data_req, 
+                clock_program, 
+                temp_hum, 
+                heart_program_control};
 
 // Whenever we deal with yahoo finance stuff it will get it's details and implementation from yahoo finance. 
 extern crate yahoo_finance; 

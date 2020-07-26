@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message ClockProgram{
+    // Compared to default California time, what how much
+    // Should we offset our hour
+    int32 hour_offset = 1; 
+    // How fast do we want our aniamtion to ru
+    int32 fade_animation_del = 2; 
+    // Do we want to enable hourly messages
+    bool en_hourly_messages = 3;
+    // Do we want to have the heart blink or not.  
+    bool en_blink_heart = 4; 
+    // enables the clock displays
+    bool en_display = 5; 
+}
