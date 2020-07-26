@@ -19,18 +19,17 @@ pub struct ClockControl{
     pub address_port: String
 }
 
-fn set_clock(en: bool) -> Box<[u8]>{
-    
+fn set_clock(hour_offset: i32, fade_animation_del: i32, en_hourly_messages: bool, en_blink_heart: bool, en_display: bool) -> Box <[u8]>{
     let mut out_arr = Vec::new();
     let mut clock_instr_out = Vec::new();
     // Adding our clock program instructions
     {
         let msg = clock_program::ClockProgram{
-            hour_offset: 0, 
-            fade_animation_del: 10, 
-            en_hourly_messages: true, 
-            en_blink_heart: en, 
-            en_display: en
+            hour_offset: hour_offset, 
+            fade_animation_del: fade_animation_del, 
+            en_hourly_messages: en_hourly_messages, 
+            en_blink_heart: en_blink_heart, 
+            en_display: en_display
         };
         let mut writer = Writer::new(&mut clock_instr_out);
         writer
@@ -78,6 +77,10 @@ fn set_clock(en: bool) -> Box<[u8]>{
     return out_arr.into_boxed_slice();
 }
 
+fn en_clock(en: bool) -> Box<[u8]>{
+    return set_clock(0, 10, false, en, en);
+}
+
 // Implementation for the UDP control of the clock
 impl ClockControl{
     /*Depricated functions that are only here until I update my clock with newer code */
@@ -92,13 +95,13 @@ impl ClockControl{
 
     pub fn on(&self){
         self.socket
-                    .send_to(&set_clock(true), &self.address_port)
+                    .send_to(&en_clock(true), &self.address_port)
                     .expect("could not send our instruction data");
     }
 
     pub fn off(&self){
         self.socket
-                    .send_to(&set_clock(false), &self.address_port)
+                    .send_to(&en_clock(false), &self.address_port)
                     .expect("could not send our instruction data");
     }
 }
