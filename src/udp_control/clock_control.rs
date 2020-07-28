@@ -80,7 +80,7 @@ fn set_clock(hour_offset: i32, fade_animation_del: i32, en_hourly_messages: bool
 fn en_clock(en: bool) -> Box<[u8]>{
     return set_clock(0, 10, false, en, en);
 }
-
+  
 // Implementation for the UDP control of the clock
 impl ClockControl{
     /*Depricated functions that are only here until I update my clock with newer code */

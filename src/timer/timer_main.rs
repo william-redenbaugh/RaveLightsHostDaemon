@@ -59,7 +59,7 @@ pub fn timer_main(timer_set: TimerSetupStruct){
         hour: 2, 
         minute: 0, 
         day: 0,
-        event: main_device_manager::clock_off_msg(),
+        event: main_device_manager::clock_en_msg(false),
         event_exec: false
     };
 
@@ -68,7 +68,7 @@ pub fn timer_main(timer_set: TimerSetupStruct){
         hour: 9, 
         minute: 20, 
         day: 0,
-        event: main_device_manager::clock_on_msg(),
+        event: main_device_manager::clock_en_msg(true),
         event_exec: false
     };
 

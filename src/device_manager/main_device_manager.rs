@@ -151,10 +151,10 @@ pub fn heart_clock_control(rx: mpsc::Receiver<HeartClockMessagePacket>, tx: mpsc
             }
             HEART_SLEEP => {
                 if(latest_msg.val){
-                    // TODO 
+                    heart_control.sleep();
                 }
                 else{
-                    // TODO
+                    heart_control.wake();
                 }
             }
             HEART_LAMP => {
@@ -172,19 +172,34 @@ pub fn heart_clock_control(rx: mpsc::Receiver<HeartClockMessagePacket>, tx: mpsc
     }
 }
 
-pub fn clock_off_msg() -> HeartClockMessagePacket{
+pub fn clock_en_msg(en: bool) -> HeartClockMessagePacket{
     let msg = HeartClockMessagePacket{
         msg_type: ClockControlMsg::CLOCK_EN,
-        val: false
+        val: en
     };
     return msg; 
 }
 
-
-pub fn clock_on_msg() -> HeartClockMessagePacket{
+pub fn heart_sleep_msg(en: bool) -> HeartClockMessagePacket{
     let msg = HeartClockMessagePacket{
-        msg_type: ClockControlMsg::CLOCK_EN,
-        val: true
+        msg_type: ClockControlMsg::HEART_SLEEP,
+        val: en
+    };
+    return msg; 
+}
+
+pub fn heart_lamp_msg(en: bool) -> HeartClockMessagePacket{
+    let msg = HeartClockMessagePacket{
+        msg_type: ClockControlMsg::HEART_LAMP,
+        val: en
+    };
+    return msg; 
+}
+
+pub fn heart_beep_msg(en: bool) -> HeartClockMessagePacket{
+    let msg = HeartClockMessagePacket{
+        msg_type: ClockControlMsg::HEART_BEEP,
+        val: en
     };
     return msg; 
 }
