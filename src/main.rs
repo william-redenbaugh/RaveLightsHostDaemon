@@ -32,7 +32,8 @@ use protobuf::{ messagedata,
                 data_req, 
                 clock_program, 
                 temp_hum, 
-                heart_program_control};
+                heart_program_control,
+                led_strip_data};
 
 // Whenever we deal with yahoo finance stuff it will get it's details and implementation from yahoo finance. 
 extern crate yahoo_finance; 

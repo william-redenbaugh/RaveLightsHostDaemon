@@ -50,13 +50,13 @@ pub struct TeensyReturnPacket{
 // Function that will deal with our primary teensy control code. 
 pub fn teensy_main(rx: mpsc::Receiver<TeensyMessagePacket>, tx: mpsc::Sender<TeensyReturnPacket>){
     // Setup control with teensy over Serial port. 
-    //let mut p = serial::open("/dev/ttyAMA0").unwrap();
-    //let port_ref = Rc::new(RefCell::new(p));
+    let mut p = serial::open("/dev/ttyACM0").unwrap();
+    let port_ref = Rc::new(RefCell::new(p));
     
     // Teensy Controller object
-    //let teensy = serial_control::teensy_control::new_teensy_control(Rc::clone(&port_ref));
-    // Create our strip controller. 
-    //let teensy_strip = serial_control::strip_control::new_serial_strip(288, Rc::clone(&port_ref));
+    let mut teensy = serial_control::teensy_control::new_teensy_control(Rc::clone(&port_ref));
+    
+    teensy.set_main_rgb(0, 0, 0);
     loop{
         let msg_status = rx.recv().unwrap();
         if(msg_status.debug){
@@ -112,7 +112,7 @@ pub struct HeartClockReturnPacket{
 }
 pub fn heart_clock_control(rx: mpsc::Receiver<HeartClockMessagePacket>, tx: mpsc::Sender<HeartClockReturnPacket>){
     // Strings containing the ip address and ports for our UDP control devices
-    // These devices in particular don't use any particular data serialization format, 
+    // These devices in particular don't use any particular data ization format, 
     // So we just send a preset array over the internet that represents a 
     // command on the other side. 
     let clock_control_ip_addr_port = String::from("192.168.1.24:4210"); 

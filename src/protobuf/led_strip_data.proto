@@ -1,0 +1,19 @@
+syntax = "proto3"; 
+
+message LEDData{
+    // What type of data are we reading?
+    enum MessageType{
+        KELVIN_DATA = 0;  
+        RGB_DATA    = 1; 
+        HSV_DATA    = 2; 
+    }
+
+    // What type of message are we sending out 
+    MessageType message_type    = 1; 
+    // If we are sending out kelvin, then this is kelvin, red if we are sending rgb values, and hue if we are sending hsv values
+    uint32 kelvin_red_hue       = 2; 
+    // If we are sending out rgb values it's green, if we are sending hsv values it's saturation
+    uint32 green_saturation     = 3; 
+    // If we are sending out rgb values it's blue, otherwise for hsv it's value
+    uint32 blue_value           = 4; 
+}; 
