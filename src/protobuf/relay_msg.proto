@@ -1,6 +1,0 @@
-syntax = "proto3"; 
-
-message RelayMessage{
-    // Whether or not the relay has been enabled or not
-    bool en = 1; 
-}

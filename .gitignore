@@ -1,1 +1,7 @@
-/target
+RustHostDaemon/target/
+RustHostDaemon/Cargo.lock
+HostWillOSFW/CMakeFiles/
+HostWillOSFW/cmake_install.cmake
+HostWillOSFW/CMakeCache.txt
+HostWillOSFW/Makefile
+HostWillOSFW/WillOSHostRaveLights

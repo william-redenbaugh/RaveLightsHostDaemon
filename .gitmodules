@@ -1,0 +1,12 @@
+[submodule "HostWillOSFW/src/CSAL_SHARED"]
+	path = HostWillOSFW/src/CSAL_SHARED
+	url = git@github.com:william-redenbaugh/CSAL_SHARED.git
+[submodule "HostWillOSFW/src/CHAL_SHARED"]
+	path = HostWillOSFW/src/CHAL_SHARED
+	url = git@github.com:william-redenbaugh/CHAL_SHARED.git
+[submodule "HostWillOSFW/src/LinuxCSAL"]
+	path = HostWillOSFW/src/LinuxCSAL
+	url = git@github.com:william-redenbaugh/LinuxCSAL.git
+[submodule "HostWillOSFW/src/LinuxCHAL"]
+	path = HostWillOSFW/src/LinuxCHAL
+	url = git@github.com:william-redenbaugh/LinuxCHAL.git
