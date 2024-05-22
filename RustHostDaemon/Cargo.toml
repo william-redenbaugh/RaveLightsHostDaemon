@@ -6,6 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+<<<<<<< HEAD
 image = "0.24"
 jpeg-decoder = "0.1.21"
 gif = "0.10"
+=======
+serde_json = "1.0"
+serde = "1.0.171"
+>>>>>>> 2985c8c (Support sending matrix data over a udp socket)

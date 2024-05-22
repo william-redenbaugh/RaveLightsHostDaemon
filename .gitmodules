@@ -10,3 +10,6 @@
 [submodule "HostWillOSFW/src/LinuxCHAL"]
 	path = HostWillOSFW/src/LinuxCHAL
 	url = git@github.com:william-redenbaugh/LinuxCHAL.git
+[submodule "Pimeroni-HS-Rust-Driver-Pi"]
+	path = Pimeroni-HS-Rust-Driver-Pi
+	url = git@github.com:william-redenbaugh/Pimeroni-HS-Rust-Driver-Pi.git
