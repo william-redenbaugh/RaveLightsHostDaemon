@@ -1,68 +1,14 @@
 
 use std::thread;
+use std::thread::sleep;
 use std::time::Duration;
 use rustfft::{FftPlanner, num_complex::Complex};
-use lazy_static::lazy_static;
 use std::sync::mpsc::{self, Sender, Receiver};
-use std::sync::Mutex;
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 
-static mut SENDER: Option<Mutex<Sender<Vec<i16>>>> = None;
-static mut RECEVIER: Option<Mutex<Receiver<Vec<i16>>>> = None;
+fn fft_processing_thread(rx: Receiver<Vec<i16>>, tx_complex_data: Sender<Vec<Complex<i16>>>){
 
-fn init_channel() -> Receiver<Vec<i16>>{
-    let (tx, rx): (Sender<Vec<i16>>, Receiver<Vec<i16>>) = mpsc::channel();
-    unsafe {
-        SENDER = Some(Mutex::new(tx));
-    }
-
-    return rx;
-}
-
-fn read_callback(stream: &mut soundio::InStreamReader) {
-    let frame_count_max = stream.frame_count_max();
-    if let Err(e) = stream.begin_read(frame_count_max) {
-        println!("Error reading from stream: {}", e);
-        return;
-    }
     
-    let mut buffer: Vec<i16> = vec![0; stream.frame_count()];
-    for f in 0..stream.frame_count() {
-        buffer[f] = stream.sample::<i16>(0, f);
-    }
-
-    unsafe {
-        if let Some(ref sender) = SENDER {
-            let mut sender = sender.lock().unwrap();
-            sender.send(buffer).unwrap();
-        }
-    }
-}
-
-fn fft_processing_thread(tx_complex_data: Sender<Vec<Complex<i16>>>){
-    let mut ctx = soundio::Context::new();
-    ctx.set_app_name("FFT Processing Audio Module");
-    ctx.connect().unwrap();
-    ctx.flush_events();
-
-    let mut dev = ctx.input_devices().unwrap();
-    
-    if(dev.len() <= 0){
-        return
-    }
-
-    let rx = init_channel();
-
-    let mut input_stream = dev[0].open_instream(
-        44100,
-        soundio::Format::S16LE,
-        soundio::ChannelLayout::get_builtin(soundio::ChannelLayoutId::Mono),
-        2.0,
-        read_callback,
-        None::<fn()>,
-        None::<fn(soundio::Error)>,
-    ).unwrap();
-    input_stream.start().unwrap();
-
     loop{
         let data = rx.recv().unwrap();
 
@@ -72,12 +18,52 @@ fn fft_processing_thread(tx_complex_data: Sender<Vec<Complex<i16>>>){
         let mut complex_data: Vec<Complex<i16>> = data.into_iter().map(|x| Complex::new(x, 0)).collect();
 
         fft.process(&mut complex_data);
-        tx_complex_data.send(complex_data);
+        tx_complex_data.send(complex_data).unwrap();
+    }
+}
+
+fn microphone_input_thread(tx: Sender<Vec<i16>>){
+
+    // Set up the host and default input device.
+    let host = cpal::default_host();
+    let device = host.default_input_device().expect("failed to find input device");
+
+    let config = device
+    .default_input_config()
+    .expect("Failed to get default input config");
+    println!("Default input config: {:?}", config);
+
+    loop{
+        let duration = Duration::from_millis(10);
+
+        // Wrap the Duration in an Option
+        let tx_copy = tx.clone();
+        // Create and start the input stream.
+        let stream = device.build_input_stream(
+            &config.config(),
+            move |data: &[i16], _: &cpal::InputCallbackInfo| {
+                println!("Length: {}", data.len());
+                tx_copy.send(data.to_vec()).unwrap();
+            },
+            move |err| {
+                eprintln!("An error occurred on the input audio stream: {}", err);
+            }, 
+            Some(duration)
+        ).expect("Failed to build input stream");
+
+        stream.play().unwrap();        
+        sleep(duration);
     }
 }
 
 pub fn initialize_audio_pipeline() -> Receiver<Vec<Complex<i16>>>{
+    // Create pipes
     let (tx_complex_data, rx_complex_data) = mpsc::channel();
-    thread::spawn(move || fft_processing_thread(tx_complex_data));
+    let (tx, rx): (Sender<Vec<i16>>, Receiver<Vec<i16>>) = mpsc::channel();
+    
+    // Spawn thread for processing the FFT data
+    
+    thread::spawn(move || fft_processing_thread(rx, tx_complex_data));
+    thread::spawn(move || microphone_input_thread(tx));
     return rx_complex_data;
 }
