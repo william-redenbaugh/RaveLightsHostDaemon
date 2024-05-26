@@ -13,3 +13,18 @@
 [submodule "Pimeroni-HS-Rust-Driver-Pi"]
 	path = Pimeroni-HS-Rust-Driver-Pi
 	url = git@github.com:william-redenbaugh/Pimeroni-HS-Rust-Driver-Pi.git
+[submodule "LEDDriver/lib/WillOS"]
+	path = LEDDriver/lib/WillOS
+	url = git@github.com:william-redenbaugh/WillOS.git
+[submodule "LEDDriver/src/ArduinoCHAL"]
+	path = LEDDriver/src/ArduinoCHAL
+	url = git@github.com:william-redenbaugh/ArduinoCHAL.git
+[submodule "LEDDriver/src/CHAL_SHARED"]
+	path = LEDDriver/src/CHAL_SHARED
+	url = git@github.com:william-redenbaugh/CHAL_SHARED.git
+[submodule "LEDDriver/src/CSAL_SHARED"]
+	path = LEDDriver/src/CSAL_SHARED
+	url = git@github.com:william-redenbaugh/CSAL_SHARED.git
+[submodule "LEDDriver/src/TeensyOSCSAL"]
+	path = LEDDriver/src/TeensyOSCSAL
+	url = git@github.com:william-redenbaugh/TeensyOSCSAL.git
