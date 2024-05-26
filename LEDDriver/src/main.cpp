@@ -1,10 +1,13 @@
 #include <Arduino.h>
-
-void setup() {
-  SerialUSB.begin();
+#include "global_includes.h"
+#include "OS/OSThreadKernel.h"
+void setup()
+{
+    threads_init();
+    threads_list_init();
 }
 
-void loop() {
-  SerialUSB.printf("hello world\n");
-  delay(1000);
+void loop()
+{
+    os_thread_delay_s(20);
 }
