@@ -28,3 +28,6 @@
 [submodule "LEDDriver/src/TeensyOSCSAL"]
 	path = LEDDriver/src/TeensyOSCSAL
 	url = git@github.com:william-redenbaugh/TeensyOSCSAL.git
+[submodule "LEDDriver/lib/FastLED"]
+	path = LEDDriver/lib/FastLED
+	url = git@github.com:FastLED/FastLED.git
