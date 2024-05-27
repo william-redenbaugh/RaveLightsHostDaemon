@@ -1,21 +1,19 @@
-mod udp_matrix;
-mod audio_input_processing;
-use std::thread::sleep;
-use std::time::Duration;
-
-use rustfft::num_complex::ComplexFloat;
-use rustfft::num_traits::abs;
-
-
+mod audio_pipelines;
+mod peripheral_control;
 
 fn main() {
 
-    let mut udp_matrix =udp_matrix::new_udp_matrix(String::from("192.168.3.234:4200"), String::from("192.168.3.249:34254"));
+    let mut udp_matrix = peripheral_control::udp_matrix::new_udp_matrix(
+        String::from("192.168.3.234:4200"), 
+        String::from("192.168.3.249:34254"),
+        16, 
+        16
+    );
     
     udp_matrix.set_pixel(0, 0, 100, 100, 100);
     udp_matrix.update();
     
-    let audio_data = audio_input_processing::initialize_audio_pipeline();
+    let audio_data = audio_pipelines::audio_input_processing::initialize_audio_pipeline();
     let mut vals: [u8; 16] = [0; 16];
     loop{
 
