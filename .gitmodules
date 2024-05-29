@@ -31,3 +31,6 @@
 [submodule "LEDDriver/lib/FastLED"]
 	path = LEDDriver/lib/FastLED
 	url = git@github.com:FastLED/FastLED.git
+[submodule "LEDDriver/lib/Adafruit_NeoPixel"]
+	path = LEDDriver/lib/Adafruit_NeoPixel
+	url = git@github.com:adafruit/Adafruit_NeoPixel.git

@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "global_includes.h"
 #include "OS/OSThreadKernel.h"
+
+#include "rgbMatrix.h"
 void setup()
 {
     threads_init();

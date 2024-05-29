@@ -1,71 +1,159 @@
 #include "usb_driver.h"
 #include "global_includes.h"
-
 #include <FastLED.h>
+#include "project_defs.h"
+#include "rgbMatrix.h"
 
-// How many leds in your strip?
-#define NUM_LEDS 800
+enum{
+    START_LED_STRIP_TRANSAC, 
+    CONTINUE_LED_STRIP_TRANSAC,
+    END_LED_STRIP_TRANSAC,
+    INIT_LED_STRIP   
+};
 
-// For led chips like WS2812, which have a data line, ground, and power, you just
-// need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
-// ground, and power), like the LPD8806 define both DATA_PIN and CLOCK_PIN
-// Clock pin only needed for SPI based chipsets when not using hardware SPI
+uint8_t input_buffer[2048];
+int current_pixel_index = 0;
+
+#ifdef LED_STRIP_MODE
+
 #define DATA_PIN 3
 #define CLOCK_PIN 13
 
 // Define the array of leds
-uint8_t input_buffer[2048];
+uint32_t num_leds = 128;
 int current_pixel_index = 0;
-CRGB leds[NUM_LEDS];
+CRGB *leds;
+
+static inline void start_led_transaction(void){
+    current_pixel_index = 0;
+    for(int n = 0; n < num_leds; n++){
+        int index = num_leds * 3;
+        leds[n].r = input_buffer[index];
+        leds[n].g = input_buffer[index + 1];
+        leds[n].b = input_buffer[index + 2];
+    }
+    current_pixel_index += num_leds;
+}
+
+static inline void continue_led_transaction(void){
+    for(int n = 0; n < num_leds; n++){
+        int index = num_leds * 3;
+        leds[n + current_pixel_index].r = input_buffer[index];
+        leds[n + current_pixel_index].g = input_buffer[index + 1];
+        leds[n + current_pixel_index].b = input_buffer[index + 2];
+    }
+    current_pixel_index += num_leds;
+}
+
+static inline void complete_led_transaction(void){
+    for(int n = 0; n < num_leds; n++){
+        int index = num_leds * 3;
+        leds[n + current_pixel_index].r = input_buffer[index];
+        leds[n + current_pixel_index].g = input_buffer[index + 1];
+        leds[n + current_pixel_index].b = input_buffer[index + 2];    }
+    current_pixel_index += num_leds;
+    FastLED.show();
+}
+
+static inline void initialize_led(void){
+    leds = (CRGB*)malloc(sizeof(CRGB) * num_leds);
+    FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, num_leds);  // GRB ordering is assume
+}
+
+#endif
+
+#ifdef MATRIX_MODE
+
+RGBMatrixSLED1734 matrix;
+int x = 0;
+int y = 0;
+
+static inline void start_led_transaction(void){
+    int curr_x;
+    int curr_y;
+    for(curr_x = x; x < 8; curr_x++){
+        for(curr_y = y; y < 8; y++){
+            int input_index = current_pixel_index * 3;
+            current_pixel_index++;
+            uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
+            matrix.draw_point(index, 
+                input_buffer[input_index], 
+                input_buffer[input_index + 1], 
+                input_buffer[input_index + 2]
+            );
+        }
+    }    
+    x = curr_x;
+    y = curr_y;
+}
+
+static inline void continue_led_transaction(void){
+    int curr_x;
+    int curr_y;
+
+    for(curr_x = x; x < 8; curr_x++){
+        for(curr_y = y; y < 8; y++){
+            int input_index = current_pixel_index * 3;
+            current_pixel_index++;
+            uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
+            matrix.draw_point(index, 
+                input_buffer[input_index], 
+                input_buffer[input_index + 1], 
+                input_buffer[input_index + 2]
+            );
+        }
+    }    
+    x = curr_x;
+    y = curr_y;
+}
+
+static inline void complete_led_transaction(void){
+    int curr_x;
+    int curr_y;
+
+    for(curr_x = x; x < 8; curr_x++){
+        for(curr_y = y; y < 8; y++){
+            int input_index = current_pixel_index * 3;
+            current_pixel_index++;
+            uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
+            matrix.draw_point(index, 
+                input_buffer[input_index], 
+                input_buffer[input_index + 1], 
+                input_buffer[input_index + 2]
+            );
+        }
+    }    
+    x = curr_x;
+    y = curr_y;
+}
+
+static inline void initialize_led(void){
+    matrix.RGBMatrixInit();
+}
+
+#endif
+static inline void interpret_message(uint8_t mode, int num_leds){
+    switch(mode){
+        case START_LED_STRIP_TRANSAC:
+            start_led_transaction();
+        break;
+        case CONTINUE_LED_STRIP_TRANSAC:
+            continue_led_transaction();
+        break;
+        case END_LED_STRIP_TRANSAC:
+            complete_led_transaction();
+        break;
+        case INIT_LED_STRIP:
+            initialize_led();
+        break;
+        default:
+        break;
+    }
+}
 
 void usb_driver_init(void *parameters)
 {
     SerialUSB.begin();
-    FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
-    
-}
-
-static inline void interpret_led_message(uint8_t mode, int num_leds){
-        switch(mode){
-
-            case 0:{
-                current_pixel_index = 0;
-                for(int n = 0; n < num_leds; n++){
-                    int index = num_leds * 3;
-                    leds[n].r = input_buffer[index];
-                    leds[n].g = input_buffer[index + 1];
-                    leds[n].b = input_buffer[index + 2];
-                }
-                current_pixel_index += num_leds;
-            }
-            break;
-
-            case 1:{
-                for(int n = 0; n < num_leds; n++){
-                    int index = num_leds * 3;
-                    leds[n + current_pixel_index].r = input_buffer[index];
-                    leds[n + current_pixel_index].g = input_buffer[index + 1];
-                    leds[n + current_pixel_index].b = input_buffer[index + 2];
-                }
-                current_pixel_index += num_leds;
-            }
-            break;
-
-            case 2:{
-                for(int n = 0; n < num_leds; n++){
-                    int index = num_leds * 3;
-                    leds[n + current_pixel_index].r = input_buffer[index];
-                    leds[n + current_pixel_index].g = input_buffer[index + 1];
-                    leds[n + current_pixel_index].b = input_buffer[index + 2];
-                }
-                current_pixel_index += num_leds;
-                FastLED.show();
-            }
-            break;
-
-            default:
-            break;
-        }
 }
 
 void usb_driver_thread(void *parameters)
@@ -92,6 +180,6 @@ void usb_driver_thread(void *parameters)
             total_led_bytes_so_far += availableBytes;
         } 
 
-        interpret_led_message(mode, num_leds);
+        interpret_message(mode, num_leds);
     }
 }
