@@ -68,7 +68,7 @@ RGBMatrixSLED1734 matrix;
 static int x = 0;
 static int y = 0;
 
-static inline void start_led_transaction(void){
+static inline void start_led_transaction(int num_leds){
 
     x = 0;
     y = 0;
@@ -77,6 +77,39 @@ static inline void start_led_transaction(void){
     int curr_y;
     for(curr_x = x; x < 8; curr_x++){
         for(curr_y = y; y < 8; y++){
+            // How many of the LEDs in the matrix are we doing?
+            if(num_leds == 0){
+                return;
+            }
+            num_leds--;
+
+            int input_index = current_pixel_index * 3;
+            current_pixel_index++;
+            num_leds--;
+            uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
+            matrix.draw_point(index, 
+                input_buffer[input_index], 
+                input_buffer[input_index + 1], 
+                input_buffer[input_index + 2]
+            );
+        }
+    }    
+    x = curr_x;
+    y = curr_y;
+}
+
+static inline void continue_led_transaction(int num_leds){
+    int curr_x;
+    int curr_y;
+
+    for(curr_x = x; x < 8; curr_x++){
+        for(curr_y = y; y < 8; y++){
+            num_leds--;
+            // How many of the LEDs in the matrix are we doing?
+            if(num_leds == 0){
+                return;
+            }
+            
             int input_index = current_pixel_index * 3;
             current_pixel_index++;
             uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
@@ -91,32 +124,18 @@ static inline void start_led_transaction(void){
     y = curr_y;
 }
 
-static inline void continue_led_transaction(void){
+static inline void complete_led_transaction(int num_leds){
     int curr_x;
     int curr_y;
 
     for(curr_x = x; x < 8; curr_x++){
         for(curr_y = y; y < 8; y++){
-            int input_index = current_pixel_index * 3;
-            current_pixel_index++;
-            uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
-            matrix.draw_point(index, 
-                input_buffer[input_index], 
-                input_buffer[input_index + 1], 
-                input_buffer[input_index + 2]
-            );
-        }
-    }    
-    x = curr_x;
-    y = curr_y;
-}
+            // How many of the LEDs in the matrix are we doing?
+            if(num_leds == 0){
+                return;
+            }
+            num_leds--;
 
-static inline void complete_led_transaction(void){
-    int curr_x;
-    int curr_y;
-
-    for(curr_x = x; x < 8; curr_x++){
-        for(curr_y = y; y < 8; y++){
             int input_index = current_pixel_index * 3;
             current_pixel_index++;
             uint8_t index[] = {(uint8_t)curr_x, (uint8_t)curr_y};
@@ -139,13 +158,13 @@ static inline void initialize_led(void){
 static inline void interpret_message(uint8_t mode, int num_leds){
     switch(mode){
         case START_LED_STRIP_TRANSAC:
-            start_led_transaction();
+            start_led_transaction(num_leds);
         break;
         case CONTINUE_LED_STRIP_TRANSAC:
-            continue_led_transaction();
+            continue_led_transaction(num_leds);
         break;
         case END_LED_STRIP_TRANSAC:
-            complete_led_transaction();
+            complete_led_transaction(num_leds);
         break;
         case INIT_LED_STRIP:
             initialize_led();
