@@ -1,6 +1,5 @@
 #include "usb_driver.h"
 #include "global_includes.h"
-#include <FastLED.h>
 #include "project_defs.h"
 #include "rgbMatrix.h"
 
@@ -15,6 +14,7 @@ uint8_t input_buffer[2048];
 int current_pixel_index = 0;
 
 #ifdef LED_STRIP_MODE
+#include <FastLED.h>
 
 #define DATA_PIN 3
 #define CLOCK_PIN 13
@@ -65,10 +65,14 @@ static inline void initialize_led(void){
 #ifdef MATRIX_MODE
 
 RGBMatrixSLED1734 matrix;
-int x = 0;
-int y = 0;
+static int x = 0;
+static int y = 0;
 
 static inline void start_led_transaction(void){
+
+    x = 0;
+    y = 0;
+
     int curr_x;
     int curr_y;
     for(curr_x = x; x < 8; curr_x++){

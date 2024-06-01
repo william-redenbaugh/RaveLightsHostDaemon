@@ -34,3 +34,6 @@
 [submodule "LEDDriver/lib/Adafruit_NeoPixel"]
 	path = LEDDriver/lib/Adafruit_NeoPixel
 	url = git@github.com:adafruit/Adafruit_NeoPixel.git
+[submodule "LEDDriver/lib/SSD1734ArduinoDriver"]
+	path = LEDDriver/lib/SSD1734ArduinoDriver
+	url = git@github.com:william-redenbaugh/SSD1734ArduinoDriver.git

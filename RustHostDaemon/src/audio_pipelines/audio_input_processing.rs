@@ -5,7 +5,7 @@ use std::time::Duration;
 use cpal::SampleRate;
 use rustfft::{FftPlanner, num_complex::Complex};
 use std::sync::mpsc::{self, Sender, Receiver};
-use cpal::{traits::{DeviceTrait, HostTrait, StreamTrait}, SupportedStreamConfig, SupportedStreamConfigRange};
+use cpal::{traits::{DeviceTrait, HostTrait, StreamTrait}, SupportedStreamConfigRange};
 
 
 fn fft_processing_thread(rx: Receiver<Vec<i16>>, tx_complex_data: Sender<Vec<Complex<f32>>>){
@@ -16,7 +16,7 @@ fn fft_processing_thread(rx: Receiver<Vec<i16>>, tx_complex_data: Sender<Vec<Com
         }
         data.truncate(512);
         let mut planner: FftPlanner<f32> = FftPlanner::new();
-        let mut fft = planner.plan_fft_forward(data.len());
+        let fft = planner.plan_fft_forward(data.len());
         
         let mut complex_data: Vec<Complex<f32>> = data.into_iter().map(|x| Complex::new(x as f32, x as f32)).collect();
         fft.process(&mut complex_data);
@@ -35,7 +35,7 @@ fn fft_inverse_processing_thread(tx_complex_data: Sender<Vec<Complex<f32>>>, inc
         let ifft = planner.plan_fft(512, rustfft::FftDirection::Inverse);
 
         ifft.process_with_scratch(&mut incoming_data, &mut ifft_output);
-        tx_complex_data.send(ifft_output);
+        tx_complex_data.send(ifft_output).unwrap();
     }
 }
 
@@ -65,7 +65,7 @@ fn microphone_input_thread(tx: Sender<Vec<i16>>){
         &config.config(),
         move |data: &[i16], _: &cpal::InputCallbackInfo| {
             //println!("Length: {}", data.len());
-            if(data.len() < 512){
+            if data.len() < 512 {
                 return;
             }
             tx_copy.send(data.to_vec()).unwrap();

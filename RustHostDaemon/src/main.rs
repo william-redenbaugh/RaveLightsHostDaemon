@@ -23,9 +23,8 @@ fn main() {
             let mut val = 0; 
             for j in 0..16{
                 let mut sub_val;
-                unsafe{
-                    sub_val = (data[x * 16 + j].re).abs() as i32;
-                }
+                sub_val = (data[x * 16 + j].re).abs() as i32;
+
                 sub_val = sub_val/30000;
                 val = (val + sub_val)/2;
             }
@@ -34,7 +33,7 @@ fn main() {
                 val = 16;
             }
             
-            if(val > vals[x] as i32){
+            if val > vals[x] as i32 {
                 vals[x] = val as u8;
             }
             for y in 0..vals[x]{
@@ -43,7 +42,7 @@ fn main() {
             for y in vals[x]..16{
                 udp_matrix.set_pixel(x, y as usize, 0, 0, 0);
             }
-            if(vals[x] > 0){
+            if vals[x] > 0{
                 vals[x] = vals[x] - 1;
             }
         }
